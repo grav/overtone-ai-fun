@@ -85,3 +85,21 @@
         :message
         :content
         #_util/tap->)))
+
+(defn ollama [{:keys [msg model]
+               :or {model "mistral-small:24b"}}]
+  (-> (request-with-throw-on-error
+        {:headers
+         {"content-type" "application/json"}
+         :method :post
+         :url "http://localhost:11434/api/generate"
+         :body (json/json-str
+                 {:model model
+                  :prompt msg
+                  :stream false})})
+      :body
+      (json/read-str :key-fn keyword)
+      :response))
+
+(comment
+  (ollama {:msg "why is the sky blue?"}))
